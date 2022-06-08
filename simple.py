@@ -1,11 +1,13 @@
 from scipy.io import wavfile
 import os
+import numpy as np
 
 class SoundFile:
   file_name: str
   full_path: str
   sample_rate: int
-  data: any
+  len: int
+  data: np.array
 
   def __init__(self, file_name: str, full_path: str):
     self.file_name = file_name
@@ -23,7 +25,9 @@ class SoundFile:
     sample_rate, data = wavfile.read(self.full_path)
     
     self.sample_rate = sample_rate
-    self.data = data
+    self.data = np.array(data, dtype=np.int16)
+    self.len = self.data.shape[0]
+
 
 def load_sound_files() -> list[SoundFile]:
   data_directory = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'audio')
@@ -36,6 +40,5 @@ def load_sound_files() -> list[SoundFile]:
   return sound_files
 
 
-for sound_file in load_sound_files():
-  print(sound_file)
-  print(sound_file.data)
+if __name__ == "__main__":
+  print(load_sound_files())
