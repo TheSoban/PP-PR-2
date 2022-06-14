@@ -1,6 +1,7 @@
 from scipy.io import wavfile
 import os
 import numpy as np
+import math
 
 class SoundFile:
   file_name: str
@@ -8,12 +9,14 @@ class SoundFile:
   sample_rate: int
   len: int
   data: np.array
+  noise: np.array
 
   def __init__(self, file_name: str, full_path: str):
     self.file_name = file_name
     self.full_path = full_path
 
     self.load_audio_data()
+    self.apply_noise()
 
   def __repr__(self):
     number_of_channels = 1 if len(self.data.shape) == 1 else self.data.shape[1]
@@ -27,7 +30,17 @@ class SoundFile:
     self.sample_rate = sample_rate
     self.data = np.array(data, dtype=np.int16)
     self.len = self.data.shape[0]
+  
+  def skip_samples(self, samples: int):
+    if self.data is not None:
+      self.data = self.data[samples:]
+    if self.noise is not None:
+      self.noise = self.noise[samples:]
 
+
+  def apply_noise(self):
+    if self.data is not None:
+      self.noise = self.data + np.random.normal(0, 0.1, self.data.shape)
 
 def load_sound_files() -> list[SoundFile]:
   data_directory = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'audio')
